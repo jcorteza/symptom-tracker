@@ -12,6 +12,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --color-blue-main: #006E90;
+  --color-blue-subtle: #ADCAD6;
+  --color-blue-pop: #41BBD9;
+  --color-orange: #F18F01;
+  --color-green: #99C24D
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -20,7 +28,8 @@
 }
 
 body {
-  background: var(--background);
+  /* background: var(--background); */
+  background: var(--color-blue-subtle);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

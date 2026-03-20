@@ -26,9 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-blue-subtle`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}
       >
-        <div className="bg-blue-main text-white p-4 flex justify-between">
+        <div className="bg-st-ocean text-white p-4 flex justify-between">
           <h1 className="text-xl"><Link href="/">Symptom Tracker</Link></h1>
           <nav>
             <ul className="flex gap-4">

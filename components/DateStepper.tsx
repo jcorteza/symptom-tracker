@@ -20,9 +20,9 @@ export default function DateStepper(props: { date: string }) {
         redirect(`/daily/${calculateNextDay(props.date)}`);
     }
     return (
-        <div className='flex items-stretch justify-between max-w-3xl w-full h-11 py-3 px-5 bg-white rounded-xl'>
+        <div className='flex items-stretch justify-between max-w-3xl w-full h-11 py-2 px-5 bg-white rounded-xl border-2 border-st-border'>
             <button 
-            className='text-blue-main cursor-pointer'
+            className='text-st-ocean cursor-pointer'
             type='button'
             onClick={navigatePrev}>
                 <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={4} stroke='currentColor' className='size-4'>
@@ -32,7 +32,7 @@ export default function DateStepper(props: { date: string }) {
             </button>
             <h2 className='font-sans font-bold text-base'>{formattedDate}</h2>
             <button 
-            className='text-blue-main cursor-pointer' 
+            className='text-st-ocean cursor-pointer' 
             type='button'
             onClick={navigateNext}>
                 <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={4} stroke='currentColor' className='size-4'>

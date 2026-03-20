@@ -13,11 +13,26 @@
 }
 
 @theme {
-  --color-blue-main: #006E90;
-  --color-blue-subtle: #ADCAD6;
-  --color-blue-pop: #41BBD9;
-  --color-orange: #F18F01;
-  --color-green: #99C24D
+  /* ── Backgrounds ── */
+  --color-st-canvas:      #EFF7FA;  /* app background */
+
+  /* ── Brand blues ── */
+  --color-st-ocean:       #006E90;  /* primary — nav, buttons, key UI */
+  --color-st-mist:        #ADCAD6;  /* subtle — inactive states, decorative */
+  --color-st-pool:        #41BBD9;  /* pop — accents, highlights */
+
+  /* ── Accent ── */
+  --color-st-amber:       #F18F01;  /* orange — CTAs, warnings, annotations */
+  --color-st-sage:        #99C24D;  /* green — positive states, completion */
+
+  /* ── Neutrals ── */
+  --color-st-ink:         #1A2E35;  /* primary text */
+  --color-st-slate:       #5A7A85;  /* secondary / meta text */
+  --color-st-fog:         #AABFC7;  /* placeholder text */
+
+  /* ── Structural ── */
+  --color-st-border:      #D6E8EE;  /* card borders, dividers */
+  --color-st-rule:        #E0EEF2;  /* section rules, severity bar bg */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,8 +43,7 @@
 }
 
 body {
-  /* background: var(--background); */
-  background: var(--color-blue-subtle);
+  background: var(--color-st-canvas);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

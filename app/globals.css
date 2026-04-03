@@ -33,6 +33,17 @@
   /* ── Structural ── */
   --color-st-border:      #D6E8EE;  /* card borders, dividers */
   --color-st-rule:        #E0EEF2;  /* section rules, severity bar bg */
+
+  /* ── Modal-specific ── */
+  --color-st-pool-tint:     #E4F6FB;  /* selected radio bg, tag pills — tint of st-pool */
+  --color-st-input-bg:      #F8FCFD;  /* text input field background */
+  --color-st-btn-disabled:  #C8DDE5;  /* disabled button fill/stroke */
+}
+
+@layer components {
+  .textInputColors {
+    @apply bg-white border-st-border border-2;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

@@ -41,10 +41,11 @@ export default function Revieiw({ showCustomization, newSymptomName, newSymptomT
                             <p className='text-st-ink text-sm'>Max Value: <span className='font-medium'>{newSymptomMaxValue} {newSymptomType === SymptomType.DURATION ? `${ newSymptomTimeUnit}` : ''}</span></p>}
                         {showCustomization && newSymptomType === SymptomType.SEVERITY &&
                             <ul>
+                                <li className='text-st-ink text-sm'>None: <span className='font-medium'>0</span></li>
                                 <li className='text-st-ink text-sm font-medium'>Mild: <span className='font-medium'>{newSymptomThresholds?.mild}</span></li>
                                 <li className='text-st-ink text-sm font-normal'>Moderate: <span className='font-medium'>{newSymptomThresholds?.moderate}</span></li>
                                 <li className='text-st-ink text-sm font-medium'>Strong: <span className='font-medium'>{newSymptomThresholds?.strong}</span></li>
-                                <li className='text-st-ink text-sm'>Extreme: <span className='font-medium'>{newSymptomThresholds?.extreme}</span></li>
+                                <li className='text-st-ink text-sm'>Extreme: <span className='font-medium'>10</span></li>
                             </ul>}
                         {!showCustomization &&
                             <p className='text-st-ink text-sm'>Customization: <span className='font-medium'>None</span></p>}

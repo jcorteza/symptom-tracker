@@ -15,15 +15,30 @@ type Props = {
     addSymptom: (name: string, type: SymptomType, maxValues?: number, timeUnit?: string, thresholds?: SeverityThresholds) => void;
 }
 
+enum ModalStage {
+    BASIC_SETUP = 0,
+    CUSTOMIZATION_OPT_IN = 1,
+    CUSTOMIZATION_SETUP = 2,
+    REVIEW = 3
+}
+
 export default function NewSymptomModal(props: Props) {
     const { isOpen, setIsOpen, addSymptom } = props;
     const dialogRef = useRef<HTMLDialogElement>(null);
+    const [modalStage, setModalStage] = useState(ModalStage.BASIC_SETUP);
     const [showCustomization, setShowCustomization] = useState(false);
-    const [newSymptomName, setNewSymptomName] = useState('');
-    const [newSymptomType, setNewSymptomType] = useState<SymptomType>(SymptomType.BOOLEAN);
-    const [newSymptomMaxValue, setNewSymptomMaxValue] = useState<number | undefined>();
-    const [newSymptomTimeUnit, setNewSymptomTimeUnit] = useState<TimeUnit | undefined>();
-    const [newSymptomThresholds, setNewSymptomThresholds] = useState<Partial<SeverityThresholds>>({});
+    const [name, setName] = useState('');
+    const [type, setType] = useState<SymptomType>(SymptomType.BOOLEAN);
+    const [maxValue, setMaxValue] = useState<number | undefined>();
+    const [timeUnit, setTimeUnit] = useState<TimeUnit | undefined>();
+    const [thresholds, setThresholds] = useState<Partial<SeverityThresholds>>({});
+    const [fieldMessages, setFieldMessages] = useState({
+        name: '',
+        maxValue: '',
+        mild: '',
+        moderate: '',
+        strong: ''
+    });
 
     useEffect(() => {
         const dialog = dialogRef.current;
@@ -38,19 +53,13 @@ export default function NewSymptomModal(props: Props) {
             dialog?.close();
         }
     }, [isOpen]);
-
+    
     useEffect(() => {
         const dialog = dialogRef.current;
 
         const handleClose = (event: Event | KeyboardEvent) => {
             event.preventDefault();
             event.stopPropagation();
-            setShowCustomization(false);
-            setNewSymptomName('')
-            setNewSymptomType(SymptomType.BOOLEAN);
-            setNewSymptomMaxValue(undefined);
-            setNewSymptomTimeUnit(undefined);
-            setNewSymptomThresholds({});
             setIsOpen(false);
         };
 
@@ -76,71 +85,79 @@ export default function NewSymptomModal(props: Props) {
         }
     }, [setIsOpen]);
 
-    enum ModalStage {
-        BASIC_SETUP = 0,
-        CUSTOMIZATION_OPT_IN = 1,
-        CUSTOMIZATION_SETUP = 2,
-        REVIEW = 3
-    }
-    const [modalStage, setModalStage] = useState(ModalStage.BASIC_SETUP);
+    const isValueRangeInvalid = (newValue?: number) => newValue === undefined || newValue >= 10 || newValue <= 0;
+    const isSeverityThresholdInvalid = (thresholdLevel: keyof SeverityThresholds, newValue: number) => {
+        const { mild, moderate, strong } = thresholds;
+        switch (thresholdLevel) {
+            case 'mild':
+                return moderate !== undefined && newValue > (moderate as number)  || strong !== undefined && newValue > (strong as number);
+            case 'moderate':
+                return mild !== undefined && newValue < (mild as number)  || strong !== undefined && newValue > (strong as number);
+            case 'strong':
+                return mild !== undefined && newValue < (mild as number)  || moderate !== undefined && newValue < (moderate as number);
+            default:
+                return false;
+        }
+    };
 
-    const validateStages = () => {
-        const invalidFields: string[] = [];
+    const validateSeverity = (newThresholds: SeverityThresholds) => {
+        const valueDiffAndDefined = (thresholdLevel: keyof SeverityThresholds) => thresholds[thresholdLevel] !== newThresholds[thresholdLevel] && newThresholds[thresholdLevel] !== undefined;
+        const outOfRangeMessage = 'Value should be a number greater than 0 and less than 10.';
+        const newFieldMessages = { ...fieldMessages };
+
+        if (valueDiffAndDefined('mild')) {
+            if (isValueRangeInvalid(newThresholds.mild)) {
+                newFieldMessages.mild = outOfRangeMessage;
+            } else if (isSeverityThresholdInvalid('mild', newThresholds.mild)) {
+                newFieldMessages.mild = `Mild should be a number less than moderate and strong.`
+            } else {
+                newFieldMessages.mild = '';
+            }
+        } else if (valueDiffAndDefined('moderate')) {
+            if (isValueRangeInvalid(newThresholds.moderate)) {
+                newFieldMessages.moderate = outOfRangeMessage;
+            } else if (isSeverityThresholdInvalid('moderate', newThresholds.moderate)) {
+                newFieldMessages.moderate = `Moderate should be a number greater than mild and less than strong.`
+            } else {
+                newFieldMessages.moderate = '';
+            }
+        } else if (valueDiffAndDefined('strong')) {
+            if (isValueRangeInvalid(newThresholds.strong)) {
+                newFieldMessages.strong = outOfRangeMessage;
+            } else if (isSeverityThresholdInvalid('strong', newThresholds.strong)) {
+                newFieldMessages.strong = `Strong should be a number greater than mild and moderate.`
+            } else {
+                newFieldMessages.strong = '';
+            }
+        }
+        setFieldMessages(newFieldMessages);
+        setThresholds(newThresholds);
+    };
+
+    const hasInvalidValues = () => {
         switch (modalStage) {
             case ModalStage.BASIC_SETUP:
-                if (!newSymptomName || !newSymptomName.trim()) {
-                    invalidFields.push('Symptom Name');
-                }
-
-                if (!newSymptomType) {
-                    invalidFields.push('Symptom Type');
-                }
-                return invalidFields;
+                return !name || !!fieldMessages.name;
             case ModalStage.CUSTOMIZATION_SETUP:
-                switch(newSymptomType) {
+                switch(type) {
                     case SymptomType.SEVERITY:
-                        if (newSymptomThresholds.mild === undefined) {
-                            invalidFields.push('Mild');
-                        }
-
-                        if (newSymptomThresholds.moderate === undefined) {
-                            invalidFields.push('Moderate');
-                        }
-
-                        if (newSymptomThresholds.moderate === undefined) {
-                            invalidFields.push('Severe');
-                        }
-
-                        if (newSymptomThresholds.extreme === undefined) {
-                            invalidFields.push('Extreme');
-                        }
-                        return invalidFields;
+                        const { mild, moderate, strong} = thresholds;
+                        return !mild || !moderate || !strong || !!fieldMessages.mild || !!fieldMessages.moderate || !!fieldMessages.strong;
                     case SymptomType.DURATION:
-                        if (!newSymptomTimeUnit) {
-                            invalidFields.push('Time Unit');
-                        }
-
-                        if (newSymptomMaxValue === undefined) {
-                            invalidFields.push('Max Value');
-                        }
-                        return invalidFields;
                     case SymptomType.COUNT:
-                        if (newSymptomMaxValue === undefined) {
-                            invalidFields.push('Max Value');
-                        }
-                        return invalidFields;
+                        return !maxValue || !!fieldMessages.maxValue;
                     default:
-                        return invalidFields;
+                        return false;
                 }
             default:
-                return invalidFields;
+                return false;
         }
-    }
+    };
 
     const setPrevModalStage = () => {
         switch (modalStage) {
             case ModalStage.REVIEW:
-                if (newSymptomType === SymptomType.BOOLEAN) {
+                if (type === SymptomType.BOOLEAN) {
                     setModalStage(ModalStage.BASIC_SETUP);
                 } else if (showCustomization) {
                     setModalStage(ModalStage.CUSTOMIZATION_SETUP);
@@ -160,7 +177,7 @@ export default function NewSymptomModal(props: Props) {
     const setNextModalStage = () => {
         switch (modalStage) {
             case ModalStage.BASIC_SETUP:
-                if (newSymptomType === SymptomType.BOOLEAN) {
+                if (type === SymptomType.BOOLEAN) {
                     setModalStage(ModalStage.REVIEW);
                 } else {
                     setModalStage(ModalStage.CUSTOMIZATION_OPT_IN);
@@ -179,12 +196,10 @@ export default function NewSymptomModal(props: Props) {
         }
     };
 
-    const invalidFields = validateStages();
-
     return (
         <dialog
             ref={dialogRef}
-            className="m-auto outline-none w-md h-max rounded-xl border border-st-border backdrop:bg-st-ink/65">
+            className="m-auto outline-none w-lg h-max rounded-xl border border-st-border backdrop:bg-st-ink/65">
             <header
                 className='flex flex-row justify-between pt-5 pb-3 px-5 mb-3 bg-st-canvas text-st-ink border-b-st-border'>
                 <h2 className='text-lg font-semibold'>Add a Symptom to Track</h2> 
@@ -202,48 +217,90 @@ export default function NewSymptomModal(props: Props) {
             <div className='px-5 min-h-96 flex flex-col gap-3'>
                 {modalStage === ModalStage.BASIC_SETUP &&
                     <BasicSetup
-                        newSymptomName={newSymptomName}
-                        newSymptomType={newSymptomType}
-                        setNewSymptomName={setNewSymptomName}
-                        setNewSymptomType={setNewSymptomType}
+                        newSymptomName={name}
+                        newSymptomType={type}
+                        nameFieldMessage={fieldMessages.name}
+                        setNewSymptomName={(newName: string) => {
+                            if (!newName?.trim()) {
+                                setFieldMessages({
+                                    ...fieldMessages,
+                                    name: 'Please enter a name for your symptom.'
+                                });
+                            } else {
+                                setFieldMessages({
+                                    ...fieldMessages,
+                                    name: ''
+                                })
+                            }
+                            setName(newName);
+                        }}
+                        setNewSymptomType={setType}
                         resetCustom={() => {
                             setShowCustomization(false);
-                            setNewSymptomMaxValue(undefined);
-                            setNewSymptomThresholds({});
-                            setNewSymptomTimeUnit(undefined);
+                            setMaxValue(undefined);
+                            setThresholds({});
+                            setTimeUnit(undefined);
                         }}/>}
                 {modalStage === ModalStage.CUSTOMIZATION_OPT_IN && 
                     <CustomizationOptIn
-                        newSymptomType={newSymptomType}
+                        newSymptomType={type}
                         showCustomization={showCustomization}
                         setShowCustomization={setShowCustomization}
-                        setNewSymptomTimeUnit={setNewSymptomTimeUnit} />}
+                        setNewSymptomTimeUnit={setTimeUnit} />}
                 {modalStage === ModalStage.CUSTOMIZATION_SETUP && 
                     <CustomizationSetup 
-                        newSymptomType={newSymptomType}
-                        newSymptomThresholds={newSymptomThresholds}
-                        newSymptomTimeUnit={newSymptomTimeUnit}
-                        newSymptomMaxValue={newSymptomMaxValue}
-                        setNewSymptomMaxValue={setNewSymptomMaxValue}
-                        setNewSymptomThresholds={setNewSymptomThresholds}
-                        setNewSymptomTimeUnit={setNewSymptomTimeUnit} />}
+                        type={type}
+                        timeUnit={timeUnit}
+                        maxValue={maxValue}
+                        thresholds={thresholds}
+                        fieldMessages={fieldMessages}
+                        setMaxValue={(newMax?: number) => {
+                            if (newMax === undefined || (newMax as number) <= 0) {
+                                setFieldMessages({
+                                    ...fieldMessages,
+                                    maxValue: 'Please enter a value greater than 0.'
+                                });
+                            } else {
+                                setFieldMessages({
+                                    ...fieldMessages,
+                                    maxValue: ''
+                                });
+                            }
+                            setMaxValue(newMax);
+                        }}
+                        setThresholds={validateSeverity}
+                        setTimeUnit={setTimeUnit} />}
                 {modalStage === ModalStage.REVIEW &&
                     <Review
                         showCustomization={showCustomization}
-                        newSymptomName={newSymptomName}
-                        newSymptomType={newSymptomType}
-                        newSymptomMaxValue={newSymptomMaxValue}
-                        newSymptomThresholds={newSymptomThresholds as SeverityThresholds}
-                        newSymptomTimeUnit={newSymptomTimeUnit}
+                        newSymptomName={name}
+                        newSymptomType={type}
+                        newSymptomMaxValue={maxValue}
+                        newSymptomThresholds={thresholds as SeverityThresholds}
+                        newSymptomTimeUnit={timeUnit}
                         handleSave={() => {
-                            addSymptom(newSymptomName, newSymptomType, newSymptomMaxValue, newSymptomTimeUnit, newSymptomThresholds as SeverityThresholds);
+                            addSymptom(name, type, maxValue, timeUnit, thresholds as SeverityThresholds);
+                            setModalStage(ModalStage.BASIC_SETUP);
+                            setShowCustomization(false);
+                            setName('');
+                            setType(SymptomType.BOOLEAN);
+                            setMaxValue(undefined);
+                            setTimeUnit(undefined);
+                            setThresholds({});
+                            setFieldMessages({
+                                name: '',
+                                mild: '',
+                                moderate: '',
+                                strong: '',
+                                maxValue: ''
+                            });
                             setIsOpen(false);
                         }}/>}
             </div>
             <footer
                 className='flex flex-row justify-between pt-2 pb-5 px-5 border-t border-t-st-rule'>
                 <Button text='Previous' handleClick={setPrevModalStage} isDisabled={modalStage === ModalStage.BASIC_SETUP} isSecondaryAction />
-                <Button text='Next' handleClick={setNextModalStage} isDisabled={modalStage === ModalStage.REVIEW || invalidFields.length > 0} />
+                <Button text='Next' handleClick={setNextModalStage} isDisabled={modalStage === ModalStage.REVIEW || hasInvalidValues()} />
             </footer>
         </dialog>
     );

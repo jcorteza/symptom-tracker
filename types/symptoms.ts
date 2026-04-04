@@ -23,8 +23,8 @@ export type CountSymptom = Symptom & {
 }
 
 export enum TimeUnit {
-    MINUTES = 'minutes',
-    HOURS = 'hours'
+    MINUTES = 'Minutes',
+    HOURS = 'Hours'
 }
 
 export type DurationSymptom = Symptom & {
@@ -35,11 +35,10 @@ export type DurationSymptom = Symptom & {
 }
 
 export type SeverityThresholds = {
-        mild: number;
-        moderate: number;
-        strong: number;
-        extreme: number;
-    };
+    mild: number;
+    moderate: number;
+    strong: number;
+};
 
 export type SeveritySymptom = Symptom & {
     type: SymptomType.SEVERITY;
@@ -64,6 +63,7 @@ export const DEFAULT_MAX_THRESHOLDS: { [key in SymptomType]?: any } = {
         hours: 12,
     },
     [SymptomType.SEVERITY]: {
+        none: 0,
         mild: 3,
         moderate: 6,
         strong: 9,

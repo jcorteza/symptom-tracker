@@ -11,8 +11,9 @@ type Props = {
     newSymptomName: string;
     setNewSymptomName: (name:string) => void;
     resetCustom: () => void;
+    nameFieldMessage: string;
 };
-export default function BasicSetup({ newSymptomType, setNewSymptomType, newSymptomName, setNewSymptomName, resetCustom: resetCustomOptIn }: Props ) {
+export default function BasicSetup({ newSymptomType, setNewSymptomType, newSymptomName, setNewSymptomName, resetCustom: resetCustomOptIn, nameFieldMessage }: Props ) {
     return (<>
         <FormGroup legendText='What type of symptom do you want to track?'>
             <RadioCard 
@@ -61,6 +62,7 @@ export default function BasicSetup({ newSymptomType, setNewSymptomType, newSympt
             placeholder='Headache Duration'
             name='Symptom Name'
             value={newSymptomName}
+            infoMessage={nameFieldMessage}
             handleChange={(e) => { setNewSymptomName(e.target.value); }} />
     </>);
 }

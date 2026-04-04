@@ -2,8 +2,15 @@
 
 import clsx from 'clsx';
 
-export default function Button(props: { text: string, handleClick: () => void, isSecondaryAction?: boolean, isDisabled?: boolean, isSubmit?: boolean }) {
-    const { text, handleClick, isSecondaryAction, isDisabled, isSubmit } = props;
+type Props = {
+    text: string;
+    handleClick: () => void;
+    isSecondaryAction?: boolean;
+    isDisabled?: boolean;
+    isSubmit?: boolean;
+    title?: string;
+}
+export default function Button({ text, handleClick, isSecondaryAction, isDisabled, isSubmit, title }: Props) {
     const styleDiff = {
         'bg-white border-2': isSecondaryAction,
         'text-st-btn-disabled border-st-btn-disabled': isSecondaryAction && isDisabled, // disabled secondary action
@@ -16,7 +23,8 @@ export default function Button(props: { text: string, handleClick: () => void, i
         <button type={(isSubmit) ? 'submit' : 'button'}
             onClick={handleClick}
             disabled={isDisabled}
-            className={clsx('py-2 px-3 border rounded-xl min-w-30 box-border font-bold text-sm', styleDiff)}>
+            title={title}
+            className={clsx('py-2 px-3 border rounded-xl min-w-30 box-border font-bold text-sm outline-none', styleDiff)}>
             {text}
         </button>
     );

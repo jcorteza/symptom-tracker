@@ -4,7 +4,6 @@ import { SymptomType, TimeUnit, SeverityThresholds, DEFAULT_MAX_THRESHOLDS } fro
 import FormGroup from '@/components/modal/FormGroup';
 import RadioCard from '@/components/modal/RadioCard';
 import TextNumberField from "../TextNumberField";
-import clsx from 'clsx';
 
 type Props = {
     type: SymptomType;
@@ -14,7 +13,7 @@ type Props = {
     fieldMessages: { mild: string; moderate: string; strong: string; maxValue: string; }
     setTimeUnit: (timeUnit: TimeUnit) => void;
     setMaxValue: (value: number) => void;
-    setThresholds: (thresholds: SeverityThresholds) => void;
+    handleSeverityChange: (thresholds: SeverityThresholds) => void;
 }
 export default function CustomizationSetup({
     type,
@@ -24,19 +23,20 @@ export default function CustomizationSetup({
     fieldMessages,
     setTimeUnit,
     setMaxValue,
-    setThresholds
+    handleSeverityChange
 }: Props) {
     let explanation = '';
     switch(type) {
         case SymptomType.COUNT:
-            explanation = `The default max for "count" symptoms is ${DEFAULT_MAX_THRESHOLDS[SymptomType.COUNT]}.`
+            explanation = `The default max for "count" symptoms is ${DEFAULT_MAX_THRESHOLDS[SymptomType.COUNT]}.`;
             break;
         case SymptomType.DURATION:
-            explanation = `The default max for "duration" symptoms is ${DEFAULT_MAX_THRESHOLDS[SymptomType.DURATION][timeUnit as TimeUnit]} ${timeUnit as TimeUnit}.`
+            explanation = `The default max for "duration" symptoms is ${DEFAULT_MAX_THRESHOLDS[SymptomType.DURATION][timeUnit as TimeUnit]} ${timeUnit?.toLowerCase()}.`;
+            console.log(explanation);
             break;
         case SymptomType.SEVERITY:
             const { mild, moderate, strong } = DEFAULT_MAX_THRESHOLDS[SymptomType.SEVERITY];
-            explanation = `Severity is scored on a scale of 0 (none) to 10 (extreme). Set the values where mild, moderate, and strong begin for you. For example, the defaults are mild–${mild}, moderate–${moderate}, strong–${strong}.`
+            explanation = `Severity is scored on a scale of 0 (none) to 10 (extreme). Set the values where mild, moderate, and strong begin for you. For example, the defaults are mild–${mild}, moderate–${moderate}, strong–${strong}.`;
             break;
     }
 
@@ -60,7 +60,7 @@ export default function CustomizationSetup({
                 </FormGroup>}
             {type === SymptomType.DURATION &&
                 <TextNumberField
-                    labelText={`What is the max ${timeUnit} you want to track?`}
+                    labelText={`What is the max ${timeUnit?.toLowerCase()} you want to track?`}
                     placeholder='Number greater than zero.'
                     name='Max Duration Value'
                     type='number'
@@ -88,7 +88,7 @@ export default function CustomizationSetup({
                                 infoMessage={fieldMessages.mild}
                                 isPartial
                                 handleChange={({ target: { value }}) => {
-                                    setThresholds({
+                                    handleSeverityChange({
                                         ...thresholds,
                                         mild: (!value ? undefined : parseInt(value)) } as SeverityThresholds);
                                 }}/>
@@ -102,7 +102,7 @@ export default function CustomizationSetup({
                                 infoMessage={fieldMessages.moderate}
                                 isPartial
                                 handleChange={({ target: { value }}) => {
-                                    setThresholds({
+                                    handleSeverityChange({
                                         ...thresholds,
                                         moderate: (!value ? undefined : parseInt(value)) } as SeverityThresholds);
                                 }}/>
@@ -116,7 +116,7 @@ export default function CustomizationSetup({
                                 infoMessage={fieldMessages.strong}
                                 isPartial
                                 handleChange={({ target: { value }}) => {
-                                    setThresholds({
+                                    handleSeverityChange({
                                         ...thresholds,
                                         strong: (!value ? undefined : parseInt(value)) } as SeverityThresholds);
                                 }}/>

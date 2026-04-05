@@ -60,7 +60,7 @@ export type SymptomsData = {
 export const DEFAULT_MAX_THRESHOLDS: { [key in SymptomType]?: any } = {
     [SymptomType.COUNT]: 10,
     [SymptomType.DURATION]: {
-        hours: 12,
+        [TimeUnit.HOURS]: 12,
     },
     [SymptomType.SEVERITY]: {
         none: 0,

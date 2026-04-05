@@ -8,6 +8,7 @@ import BasicSetup from '@/components/modal/stages/BasicSetup';
 import CustomizationOptIn from '@/components/modal/stages/CustomizationOptIn';
 import CustomizationSetup from '@/components/modal/stages/CustomizationSetup';
 import Review from '@/components/modal/stages/Review';
+import { getSeverityMessages, getNameValidityMessage, getMaxValueValidityMessage, FieldMessages } from '@/lib/modalValidation';
 
 type Props = {
     isOpen: boolean;
@@ -85,52 +86,8 @@ export default function NewSymptomModal(props: Props) {
         }
     }, [setIsOpen]);
 
-    const isValueRangeInvalid = (newValue?: number) => newValue === undefined || newValue >= 10 || newValue <= 0;
-    const isSeverityThresholdInvalid = (thresholdLevel: keyof SeverityThresholds, newValue: number) => {
-        const { mild, moderate, strong } = thresholds;
-        switch (thresholdLevel) {
-            case 'mild':
-                return moderate !== undefined && newValue > (moderate as number)  || strong !== undefined && newValue > (strong as number);
-            case 'moderate':
-                return mild !== undefined && newValue < (mild as number)  || strong !== undefined && newValue > (strong as number);
-            case 'strong':
-                return mild !== undefined && newValue < (mild as number)  || moderate !== undefined && newValue < (moderate as number);
-            default:
-                return false;
-        }
-    };
-
-    const validateSeverity = (newThresholds: SeverityThresholds) => {
-        const valueDiffAndDefined = (thresholdLevel: keyof SeverityThresholds) => thresholds[thresholdLevel] !== newThresholds[thresholdLevel] && newThresholds[thresholdLevel] !== undefined;
-        const outOfRangeMessage = 'Value should be a number greater than 0 and less than 10.';
-        const newFieldMessages = { ...fieldMessages };
-
-        if (valueDiffAndDefined('mild')) {
-            if (isValueRangeInvalid(newThresholds.mild)) {
-                newFieldMessages.mild = outOfRangeMessage;
-            } else if (isSeverityThresholdInvalid('mild', newThresholds.mild)) {
-                newFieldMessages.mild = `Mild should be a number less than moderate and strong.`
-            } else {
-                newFieldMessages.mild = '';
-            }
-        } else if (valueDiffAndDefined('moderate')) {
-            if (isValueRangeInvalid(newThresholds.moderate)) {
-                newFieldMessages.moderate = outOfRangeMessage;
-            } else if (isSeverityThresholdInvalid('moderate', newThresholds.moderate)) {
-                newFieldMessages.moderate = `Moderate should be a number greater than mild and less than strong.`
-            } else {
-                newFieldMessages.moderate = '';
-            }
-        } else if (valueDiffAndDefined('strong')) {
-            if (isValueRangeInvalid(newThresholds.strong)) {
-                newFieldMessages.strong = outOfRangeMessage;
-            } else if (isSeverityThresholdInvalid('strong', newThresholds.strong)) {
-                newFieldMessages.strong = `Strong should be a number greater than mild and moderate.`
-            } else {
-                newFieldMessages.strong = '';
-            }
-        }
-        setFieldMessages(newFieldMessages);
+    const handleSeverityChange = (thresholds: Partial<SeverityThresholds>, fieldMessages: FieldMessages) => (newThresholds: Partial<SeverityThresholds>) => {
+        setFieldMessages(getSeverityMessages(newThresholds, thresholds, fieldMessages));
         setThresholds(newThresholds);
     };
 
@@ -221,17 +178,10 @@ export default function NewSymptomModal(props: Props) {
                         newSymptomType={type}
                         nameFieldMessage={fieldMessages.name}
                         setNewSymptomName={(newName: string) => {
-                            if (!newName?.trim()) {
-                                setFieldMessages({
-                                    ...fieldMessages,
-                                    name: 'Please enter a name for your symptom.'
-                                });
-                            } else {
-                                setFieldMessages({
-                                    ...fieldMessages,
-                                    name: ''
-                                })
-                            }
+                            setFieldMessages({
+                                ...fieldMessages,
+                                name: getNameValidityMessage(newName)
+                            });
                             setName(newName);
                         }}
                         setNewSymptomType={setType}
@@ -255,20 +205,13 @@ export default function NewSymptomModal(props: Props) {
                         thresholds={thresholds}
                         fieldMessages={fieldMessages}
                         setMaxValue={(newMax?: number) => {
-                            if (newMax === undefined || (newMax as number) <= 0) {
-                                setFieldMessages({
-                                    ...fieldMessages,
-                                    maxValue: 'Please enter a value greater than 0.'
-                                });
-                            } else {
-                                setFieldMessages({
-                                    ...fieldMessages,
-                                    maxValue: ''
-                                });
-                            }
+                            setFieldMessages({
+                                ...fieldMessages,
+                                maxValue: getMaxValueValidityMessage(newMax)
+                            });
                             setMaxValue(newMax);
                         }}
-                        setThresholds={validateSeverity}
+                        handleSeverityChange={handleSeverityChange(thresholds, fieldMessages)}
                         setTimeUnit={setTimeUnit} />}
                 {modalStage === ModalStage.REVIEW &&
                     <Review

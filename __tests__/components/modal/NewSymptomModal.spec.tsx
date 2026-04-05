@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test, beforeEach, vi, afterEach } from 'vitest';
 import { render, fireEvent, screen, cleanup } from '@testing-library/react';
 import NewSymptomModal from '@/components/modal/NewSymptomModal';
+import { TimeUnit } from '@/types/symptoms';
 
 describe('NewSymptomModal', () => {
     const mockSetIsOpen = vi.fn();
@@ -200,8 +201,8 @@ describe('NewSymptomModal', () => {
 
         // test user on customization stage
         expect(await screen.findByText('The default max for "duration" symptoms is 12 hours.')).toBeDefined();
-        const hoursRadio = screen.getByLabelText('hours') as HTMLInputElement;
-        const minutesRadio = screen.getByLabelText('minutes') as HTMLInputElement;
+        const hoursRadio = screen.getByLabelText(TimeUnit.HOURS) as HTMLInputElement;
+        const minutesRadio = screen.getByLabelText(TimeUnit.MINUTES) as HTMLInputElement;
         expect(hoursRadio.checked).toBeTruthy();
         expect(minutesRadio.checked).toBeFalsy()
         expect((screen.getByLabelText('What is the max hours you want to track?') as HTMLInputElement).value).toBe('');
@@ -282,11 +283,9 @@ describe('NewSymptomModal', () => {
         const mildInput = screen.getByLabelText('Mild') as HTMLInputElement;
         const moderateInput = screen.getByLabelText('Moderate') as HTMLInputElement;
         const strongInput = screen.getByLabelText('Strong') as HTMLInputElement;
-        const extremeInput = screen.getByLabelText('Extreme') as HTMLInputElement;
         expect(mildInput.value).toBe('');
         expect(moderateInput.value).toBe('');
         expect(strongInput.value).toBe('');
-        expect(extremeInput.value).toBe('');
         testButtonsDisabled(false, true);
 
         // test user customizes sympotm
@@ -300,10 +299,6 @@ describe('NewSymptomModal', () => {
 
         fireEvent.change(strongInput, { target: { value: '4' }});
         expect(strongInput.value).toBe('4');
-        testButtonsDisabled(false, true);
-
-        fireEvent.change(extremeInput, { target: { value: '5' }});
-        expect(extremeInput.value).toBe('5');
         testButtonsDisabled(false, false);
         fireEvent.click(screen.getByText('Next'));
 

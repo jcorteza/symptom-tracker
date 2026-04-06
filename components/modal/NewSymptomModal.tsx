@@ -23,6 +23,8 @@ enum ModalStage {
     REVIEW = 3
 }
 
+const severityExtremes = { none: 0, extreme: 10 };
+
 export default function NewSymptomModal(props: Props) {
     const { isOpen, setIsOpen, addSymptom } = props;
     const dialogRef = useRef<HTMLDialogElement>(null);
@@ -32,7 +34,7 @@ export default function NewSymptomModal(props: Props) {
     const [type, setType] = useState<SymptomType>(SymptomType.BOOLEAN);
     const [maxValue, setMaxValue] = useState<number | undefined>();
     const [timeUnit, setTimeUnit] = useState<TimeUnit | undefined>();
-    const [thresholds, setThresholds] = useState<Partial<SeverityThresholds>>({});
+    const [thresholds, setThresholds] = useState<Partial<SeverityThresholds>>(severityExtremes);
     const [fieldMessages, setFieldMessages] = useState({
         name: '',
         maxValue: '',
@@ -229,7 +231,7 @@ export default function NewSymptomModal(props: Props) {
                             setType(SymptomType.BOOLEAN);
                             setMaxValue(undefined);
                             setTimeUnit(undefined);
-                            setThresholds({});
+                            setThresholds(severityExtremes);
                             setFieldMessages({
                                 name: '',
                                 mild: '',

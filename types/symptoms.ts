@@ -29,15 +29,17 @@ export enum TimeUnit {
 
 export type DurationSymptom = Symptom & {
     type: SymptomType.DURATION;
-    value: number;
+    value: number; // in minutes
     timeUnit: TimeUnit;
     customMax?: number;
 }
 
 export type SeverityThresholds = {
+    none: number;
     mild: number;
     moderate: number;
     strong: number;
+    extreme: number;
 };
 
 export type SeveritySymptom = Symptom & {
@@ -64,9 +66,9 @@ export const DEFAULT_MAX_THRESHOLDS: { [key in SymptomType]?: any } = {
     },
     [SymptomType.SEVERITY]: {
         none: 0,
-        mild: 3,
-        moderate: 6,
-        strong: 9,
+        mild: 1,
+        moderate: 4,
+        strong: 7,
         extreme: 10
     },
     [SymptomType.BOOLEAN]: 1

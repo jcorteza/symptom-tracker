@@ -9,6 +9,12 @@ import SymptomWidget from '@/components/SymptomsWidget/SymptomWidget';
 export default function SymptomsForm(props: { date: string, symptomsData?: SymptomsData }) {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [symptomsData, setSymptomsData] = useState<SymptomsData>(props.symptomsData || { symptoms: [], notes: { text: '', tags: [] } });
+        const SYMPTOM_COLORS = [
+        'var(--color-st-pool)' ,
+        'var(--color-st-ocean)',
+        'var(--color-st-amber)',
+        'var(--color-st-sage)', 
+    ];
 
     const updateSymptom = (id: string, value: boolean | number) => {
         const { symptoms: prevSymptoms, notes} = symptomsData;
@@ -50,8 +56,12 @@ export default function SymptomsForm(props: { date: string, symptomsData?: Sympt
             <input type="hidden" name="date" value={props.date} />
             <h2 className='max-w-3xl w-full my-4 font-bold text-xs text-st-slate uppercase'>Symptoms</h2>
             <div className='max-w-3xl w-full flex flex-col gap-3'>
-                {symptomsData?.symptoms.map((symptom) => (
-                    <SymptomWidget key={symptom.id} symptom={symptom} updateSymptom={updateSymptom} />
+                {symptomsData?.symptoms.map((symptom, index) => (
+                    <SymptomWidget
+                        key={symptom.id}
+                        symptom={symptom}
+                        updateSymptom={updateSymptom}
+                        color={SYMPTOM_COLORS[index % SYMPTOM_COLORS.length]} />
                 ))}
             </div>
             <button

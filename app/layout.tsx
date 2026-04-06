@@ -28,10 +28,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}
       >
-        <div className="bg-st-ocean text-white p-4 flex justify-between">
+        <div className="bg-st-ocean text-white font-semibold p-4 flex justify-between">
           <h1 className="text-xl"><Link href="/">Symptom Tracker</Link></h1>
           <nav>
-            <ul className="flex gap-4">
+            <ul className="flex gap-4 text-sm">
               <li><Link href="/daily">Daily</Link></li>
               <li><Link href="#">Overview</Link></li>
               <li><Link href="#">Settings</Link></li>

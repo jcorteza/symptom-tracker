@@ -6,7 +6,7 @@ export const SEED_DATA = {
             name: 'Headache',
             type: SymptomType.DURATION,
             timeUnit: TimeUnit.HOURS,
-            value: 5,
+            value: 300,
         } as SymptomEntry,
         {
             id: '2',

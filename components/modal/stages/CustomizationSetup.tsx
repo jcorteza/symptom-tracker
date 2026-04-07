@@ -64,7 +64,7 @@ export default function CustomizationSetup({
                     placeholder='Number greater than zero.'
                     name='Max Duration Value'
                     type='number'
-                    value={maxValue}
+                    value={maxValue ?? ''}
                     infoMessage={fieldMessages.maxValue}
                     handleChange={(e) => { setMaxValue(Number(e.target.value)); }} />}
             {type === SymptomType.COUNT &&
@@ -73,7 +73,7 @@ export default function CustomizationSetup({
                     placeholder='Number greater than zero.'
                     name='Max Count Value'
                     type='number'
-                    value={maxValue}
+                    value={maxValue ?? ''}
                     infoMessage={fieldMessages.maxValue}
                     handleChange={(e) => { setMaxValue(Number(e.target.value)); }} />}
             {type === SymptomType.SEVERITY &&

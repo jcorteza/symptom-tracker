@@ -32,8 +32,8 @@ export default function NewSymptomModal(props: Props) {
     const [showCustomization, setShowCustomization] = useState(false);
     const [name, setName] = useState('');
     const [type, setType] = useState<SymptomType>(SymptomType.BOOLEAN);
-    const [maxValue, setMaxValue] = useState<number | undefined>();
-    const [timeUnit, setTimeUnit] = useState<TimeUnit | undefined>();
+    const [maxValue, setMaxValue] = useState<number>();
+    const [timeUnit, setTimeUnit] = useState<TimeUnit>();
     const [thresholds, setThresholds] = useState<Partial<SeverityThresholds>>(severityExtremes);
     const [fieldMessages, setFieldMessages] = useState({
         name: '',

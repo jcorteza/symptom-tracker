@@ -52,6 +52,7 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                             className={`h-full rounded-l-lg ${value >= max ? 'rounded-r-lg' : ''}`}
                             style={{
                                 width: value / max >= 1 ? '100%' :`${(value / max) * 100}%`,
+                                transition: type === SymptomType.BOOLEAN ? 'width 750ms ease-in-out' : type === SymptomType.COUNT ? 'width 300ms ease' : 'none',
                                 backgroundColor: type === SymptomType.SEVERITY ? 'transparent' : color
                             }}>
                         </div>

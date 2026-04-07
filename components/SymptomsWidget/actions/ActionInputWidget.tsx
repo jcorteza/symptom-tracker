@@ -6,33 +6,55 @@ type Props = {
     value: string;
     max: number;
     step?: string;
-    updateValue: (value: number) => void;
+    handleValueChange: (value: number) => void;
 }
-export default function ActionInputWidget({ value, step, max, updateValue }: Props) {
+export default function ActionInputWidget({ value, step, max, handleValueChange }: Props) {
     const [displayValue, setDisplayValue] = useState(value);
 
     useEffect(() => {
         setDisplayValue(value);
     }, [value]);
 
+    const isValueWholeNum = (num: string) => {
+        const updatedValueFloat = parseFloat(num);
+        const updatedValueInt = parseInt(num);
+        return updatedValueFloat == updatedValueInt;
+    };
+
     return (
-        <div className='w-max text-sm font-semibold'>
+        <div className='w-max'>
             <input
                 type='number'
                 value={displayValue}
-                inputMode='decimal'
+                inputMode={step ? 'decimal' : 'none'}
                 step={step}
                 className='text-right inline box-border outline-none no-spinners'
                 style={{ width: `${displayValue.length + 1}ch` }}
                 onChange={({ target }) => {
-                    const updatedValueFloat = parseFloat(target.value);
-                    const updatedValueInt = parseInt(target.value);
-                    setDisplayValue(updatedValueFloat == updatedValueInt ? `${updatedValueInt}` : `${updatedValueFloat}`);
+                    if (step) {
+                        setDisplayValue(isValueWholeNum(target.value) ? `${parseInt(target.value)}` : `${parseInt(target.value)}`);
+                    } else {
+                        setDisplayValue(target.value);
+                    }
                 }}
-                onBlur={() => updateValue(displayValue === 'NaN' ? 0 : parseFloat(displayValue))}
+                onBlur={() => {
+                    let updatedValue: number;
+                    if (displayValue === 'NaN') {
+                        updatedValue = 0;
+                    } else if (step) {
+                        updatedValue = parseFloat(displayValue);
+                    } else {
+                        updatedValue = parseInt(displayValue);
+                        if (updatedValue === parseInt(value)) {
+                            setDisplayValue(value);
+                            return;
+                        }
+                    }
+                    handleValueChange(updatedValue);
+                }}
                 onKeyUp={event => {
                     if (event.code === 'Enter') {
-                        updateValue(displayValue === 'NaN' ? 0 : parseFloat(displayValue));
+                        handleValueChange(displayValue === 'NaN' ? 0 : step ? parseFloat(displayValue) : parseInt(displayValue));
                     } else if (event.code === 'Escape') {
                         setDisplayValue(value);
                     }

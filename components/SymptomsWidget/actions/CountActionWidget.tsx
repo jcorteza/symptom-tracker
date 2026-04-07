@@ -1,17 +1,19 @@
 import ActionWidget from "./ActionWidget";
 import ActionInputWidget from './ActionInputWidget';
+import { SymptomType } from "@/types/symptoms";
 
 type Props = {
     value: number;
     max: number;
     color: string;
+    type: SymptomType;
     increaseValue: () => void;
     decreaseValue: () => void;
     updateValue: (updatedValue: number) => void;
 }
-export default function CountActionWidget({ value, max, color, increaseValue, decreaseValue, updateValue }: Props) {
+export default function CountActionWidget({ value, max, color, type, increaseValue, decreaseValue, updateValue }: Props) {
     return (
-        <ActionWidget color={color}>
+        <ActionWidget color={color} type={type}>
             <button type='button'
                 onClick={decreaseValue}
                 className='rounded-xl outline-none text-white h-[25px] w-[25px] cursor-pointer hover:scale-110 active:scale-95 shadow-sm active:shadow-none'
@@ -20,7 +22,7 @@ export default function CountActionWidget({ value, max, color, increaseValue, de
                     <path d='M3.75 7.25a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5Z' />
                 </svg>
             </button>
-            <ActionInputWidget value={value} max={max} updateValue={updateValue} />
+            <ActionInputWidget value={`${value}`} max={max} handleValueChange={updateValue} />
             <button type='button'
                 onClick={increaseValue}
                 className='rounded-xl outline-none text-white h-[25px] w-[25px] cursor-pointer hover:scale-110 active:scale-95 shadow-sm active:shadow-none'

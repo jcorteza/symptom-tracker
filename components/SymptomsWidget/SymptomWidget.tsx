@@ -101,6 +101,7 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                         value={value}
                         max={max}
                         color={color}
+                        type={type}
                         increaseValue={() => updateSymptom(symptom.id, value + 1)}
                         decreaseValue={() => updateSymptom(symptom.id, value - 1)}
                         updateValue={(updatedValue: number) => updateSymptom(symptom.id, updatedValue)} />}
@@ -110,7 +111,7 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                             value={`${value}`}
                             max={max}
                             step={type === SymptomType.DURATION ? '0.25' : undefined}
-                            updateValue={(newValue: number) => {
+                            handleValueChange={(newValue: number) => {
                                 updateSymptom(
                                     symptom.id,
                                     isHoursValue ? newValue * 60 : newValue);

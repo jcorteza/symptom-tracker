@@ -30,7 +30,6 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
         case SymptomType.DURATION:
             defaultMax = DEFAULT_MAX_THRESHOLDS[type][TimeUnit.HOURS];
             value = isHoursValue ? symptom.value / 60  : symptom.value;
-            console.log(value);
             break;
         case SymptomType.SEVERITY:
             defaultMax = thresholds['extreme'];
@@ -108,8 +107,9 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                 {(type === SymptomType.DURATION || type === SymptomType.SEVERITY) &&
                     <ActionWidget color={color}>
                         <ActionInputWidget
-                            value={value}
+                            value={`${value}`}
                             max={max}
+                            step={type === SymptomType.DURATION ? '0.25' : undefined}
                             updateValue={(newValue: number) => {
                                 updateSymptom(
                                     symptom.id,

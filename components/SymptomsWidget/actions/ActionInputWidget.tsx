@@ -1,19 +1,42 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 type Props = {
-    value: number;
+    value: string;
     max: number;
+    step?: string;
     updateValue: (value: number) => void;
 }
-export default function ActionInputWidget({ value, max, updateValue }: Props) {
+export default function ActionInputWidget({ value, step, max, updateValue }: Props) {
+    const [displayValue, setDisplayValue] = useState(value);
+
+    useEffect(() => {
+        setDisplayValue(value);
+    }, [value]);
+
     return (
         <div className='w-max text-sm font-semibold'>
             <input
                 type='number'
-                value={value}
+                value={displayValue}
+                inputMode='decimal'
+                step={step}
                 className='text-right inline box-border outline-none no-spinners'
-                style={{ width: `${String(value).length}ch` }}
-                onChange={({ target: { value } }) => updateValue(parseInt(value))} />/{max}
+                style={{ width: `${displayValue.length + 1}ch` }}
+                onChange={({ target }) => {
+                    const updatedValueFloat = parseFloat(target.value);
+                    const updatedValueInt = parseInt(target.value);
+                    setDisplayValue(updatedValueFloat == updatedValueInt ? `${updatedValueInt}` : `${updatedValueFloat}`);
+                }}
+                onBlur={() => updateValue(displayValue === 'NaN' ? 0 : parseFloat(displayValue))}
+                onKeyUp={event => {
+                    if (event.code === 'Enter') {
+                        updateValue(displayValue === 'NaN' ? 0 : parseFloat(displayValue));
+                    } else if (event.code === 'Escape') {
+                        setDisplayValue(value);
+                    }
+                }} />/{max}
         </div>
     );
 }

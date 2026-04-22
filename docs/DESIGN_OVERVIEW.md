@@ -34,7 +34,7 @@ Additionally, in order to preserve the accuracy of the data for the user, missin
 
 The Symptom Tracker is a web application for users with accounts to track their symptom-based data over time. The app stores user-inputted symptom data and provides a way for the user to review and visualize this data.
 
-![container-diagram.drawio.png](attachment:86115fc2-c33f-4e32-a38c-445994f44ae8:container-diagram.drawio.png)
+![container-diagram](./container-diagram.png)
 
 The Symptom Tracker is a monolithic web application with a separate database. The client is responsible for rendering the HTML and executing JavaScript. It’s also responsible for sharing user-provided data with the server via HTTP requests. The server is responsible for processing HTTP requests from authenticated users and making queries to the database. User symptom data will be stored by a PostgreSQL DB.
 

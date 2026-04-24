@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { saveSymptoms } from '@/lib/actions';
-import { SeverityThresholds, SymptomsData, SymptomType, CountSymptom, DurationSymptom, SeveritySymptom, TimeUnit, SymptomEntry } from '@/types/symptoms';
+import { SeverityThresholds, SymptomsData, SymptomType, CountSymptom, DurationSymptom, SeveritySymptom, TimeUnit, SymptomEntry, BooleanSymptom } from '@/types/symptoms';
 import NewSymptomModal from '@/components/modal/NewSymptomModal';
 import SymptomWidget from '@/components/SymptomsWidget/SymptomWidget';
 
@@ -31,15 +31,20 @@ export default function SymptomsForm(props: { date: string, symptomsData?: Sympt
         const newSymptom = {
             id: crypto.randomUUID(),
             name,
-            type
+            type,
         };
         if (type === SymptomType.COUNT) {
             (newSymptom as CountSymptom)['customMax'] = maxValues;
+            (newSymptom as CountSymptom)['value'] = 0;
         } else if (type === SymptomType.DURATION) {
             (newSymptom as DurationSymptom)['customMax'] = maxValues;
             (newSymptom as DurationSymptom)['timeUnit'] = timeUnit as TimeUnit;
+            (newSymptom as DurationSymptom)['value'] = 0;
         } else if (type === SymptomType.SEVERITY) {
             (newSymptom as SeveritySymptom)['customThresholds'] = thresholds;
+            (newSymptom as SeveritySymptom)['value'] = 0;
+        } else {
+            (newSymptom as BooleanSymptom)['value'] = false;
         }
         const updatedSymptoms = [...symptomsData.symptoms, newSymptom as SymptomEntry];
         setSymptomsData({

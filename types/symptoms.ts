@@ -30,7 +30,7 @@ export enum TimeUnit {
 export type DurationSymptom = Symptom & {
     type: SymptomType.DURATION;
     value: number; // in minutes
-    timeUnit: TimeUnit;
+    timeUnit?: TimeUnit;
     customMax?: number;
 }
 
@@ -58,11 +58,27 @@ export type SymptomsData = {
     }
 }
 
-// eslint-disable-next-line
-export const DEFAULT_MAX_THRESHOLDS: { [key in SymptomType]?: any } = {
+type Defaults = {
+    [SymptomType.COUNT]: number;
+    [SymptomType.DURATION]: {
+        timeUnit: TimeUnit.HOURS;
+        value: number;
+    };
+    [SymptomType.SEVERITY]: {
+        none: number;
+        mild: number;
+        moderate: number
+        strong: number;
+        extreme: number;
+    };
+    [SymptomType.BOOLEAN]: number;
+}
+
+export const DEFAULTS: Defaults = {
     [SymptomType.COUNT]: 10,
     [SymptomType.DURATION]: {
-        [TimeUnit.HOURS]: 12,
+        timeUnit: TimeUnit.HOURS,
+        value: 12
     },
     [SymptomType.SEVERITY]: {
         none: 0,

@@ -8,7 +8,7 @@ import BasicSetup from '@/components/modal/stages/BasicSetup';
 import CustomizationOptIn from '@/components/modal/stages/CustomizationOptIn';
 import CustomizationSetup from '@/components/modal/stages/CustomizationSetup';
 import Review from '@/components/modal/stages/Review';
-import { getSeverityMessages, getNameValidityMessage, getMaxValueValidityMessage, FieldMessages } from '@/lib/modalValidation';
+import { getNameValidityMessage, getMaxValueValidityMessage } from '@/lib/modalValidation';
 
 type Props = {
     isOpen: boolean;
@@ -23,25 +23,20 @@ enum ModalStage {
     REVIEW = 3
 }
 
-const severityExtremes = { none: 0, extreme: 10 };
+export const severityExtremes = { none: 0, mild: 1, extreme: 10 };
 
 export default function NewSymptomModal(props: Props) {
     const { isOpen, setIsOpen, addSymptom } = props;
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [modalStage, setModalStage] = useState(ModalStage.BASIC_SETUP);
-    const [showCustomization, setShowCustomization] = useState(false);
+    const [optInCustomization, setOptInCustomization] = useState(false);
     const [name, setName] = useState('');
     const [type, setType] = useState<SymptomType>(SymptomType.BOOLEAN);
     const [maxValue, setMaxValue] = useState<number>();
-    const [timeUnit, setTimeUnit] = useState<TimeUnit>();
+    const [timeUnit, setTimeUnit] = useState(TimeUnit.HOURS);
     const [thresholds, setThresholds] = useState<Partial<SeverityThresholds>>(severityExtremes);
-    const [fieldMessages, setFieldMessages] = useState({
-        name: '',
-        maxValue: '',
-        mild: '',
-        moderate: '',
-        strong: ''
-    });
+    const [nameValidityMessage, setNameValidityMessage] = useState('');
+    const [maxValueValidityMessage, setMaxValueValidityMessage] = useState('');
 
     useEffect(() => {
         const dialog = dialogRef.current;
@@ -88,23 +83,33 @@ export default function NewSymptomModal(props: Props) {
         }
     }, [setIsOpen]);
 
-    const handleSeverityChange = (thresholds: Partial<SeverityThresholds>, fieldMessages: FieldMessages) => (newThresholds: Partial<SeverityThresholds>) => {
-        setFieldMessages(getSeverityMessages(newThresholds, thresholds, fieldMessages));
-        setThresholds(newThresholds);
+    const handleCustomizationOptIn = (optIn: boolean) => {
+        if (!optIn && type === SymptomType.DURATION) {
+            setTimeUnit(TimeUnit.HOURS);
+        }
+        setOptInCustomization(optIn);
+    }
+
+    const resetCustom = () => {
+        setOptInCustomization(false);
+        setMaxValue(undefined);
+        setMaxValueValidityMessage('');
+        setThresholds(severityExtremes);
+        setTimeUnit(TimeUnit.HOURS);
     };
 
     const hasInvalidValues = () => {
         switch (modalStage) {
             case ModalStage.BASIC_SETUP:
-                return !name || !!fieldMessages.name;
+                return !name || !!nameValidityMessage;
             case ModalStage.CUSTOMIZATION_SETUP:
                 switch(type) {
                     case SymptomType.SEVERITY:
-                        const { mild, moderate, strong} = thresholds;
-                        return !mild || !moderate || !strong || !!fieldMessages.mild || !!fieldMessages.moderate || !!fieldMessages.strong;
+                        const { moderate, strong} = thresholds;
+                        return moderate === undefined || strong === undefined;
                     case SymptomType.DURATION:
                     case SymptomType.COUNT:
-                        return !maxValue || !!fieldMessages.maxValue;
+                        return !maxValue || !!maxValueValidityMessage;
                     default:
                         return false;
                 }
@@ -118,7 +123,7 @@ export default function NewSymptomModal(props: Props) {
             case ModalStage.REVIEW:
                 if (type === SymptomType.BOOLEAN) {
                     setModalStage(ModalStage.BASIC_SETUP);
-                } else if (showCustomization) {
+                } else if (optInCustomization) {
                     setModalStage(ModalStage.CUSTOMIZATION_SETUP);
                 } else {
                     setModalStage(ModalStage.CUSTOMIZATION_OPT_IN);
@@ -143,7 +148,7 @@ export default function NewSymptomModal(props: Props) {
                 }
                 break;
             case ModalStage.CUSTOMIZATION_OPT_IN:
-                if (showCustomization) {
+                if (optInCustomization) {
                     setModalStage(ModalStage.CUSTOMIZATION_SETUP);
                 } else {
                     setModalStage(ModalStage.REVIEW);
@@ -178,67 +183,46 @@ export default function NewSymptomModal(props: Props) {
                     <BasicSetup
                         newSymptomName={name}
                         newSymptomType={type}
-                        nameFieldMessage={fieldMessages.name}
+                        nameFieldMessage={nameValidityMessage}
                         setNewSymptomName={(newName: string) => {
-                            setFieldMessages({
-                                ...fieldMessages,
-                                name: getNameValidityMessage(newName)
-                            });
+                            setNameValidityMessage(getNameValidityMessage(newName));
                             setName(newName);
                         }}
                         setNewSymptomType={setType}
-                        resetCustom={() => {
-                            setShowCustomization(false);
-                            setMaxValue(undefined);
-                            setThresholds({});
-                            setTimeUnit(undefined);
-                        }}/>}
+                        resetCustom={resetCustom}/>}
                 {modalStage === ModalStage.CUSTOMIZATION_OPT_IN && 
                     <CustomizationOptIn
                         newSymptomType={type}
-                        showCustomization={showCustomization}
-                        setShowCustomization={setShowCustomization}
-                        setNewSymptomTimeUnit={setTimeUnit} />}
+                        showCustomization={optInCustomization}
+                        handleCustomizationOptIn={handleCustomizationOptIn} />}
                 {modalStage === ModalStage.CUSTOMIZATION_SETUP && 
                     <CustomizationSetup 
                         type={type}
                         timeUnit={timeUnit}
                         maxValue={maxValue}
                         thresholds={thresholds}
-                        fieldMessages={fieldMessages}
+                        maxValueValidityMessage={maxValueValidityMessage}
                         setMaxValue={(newMax?: number) => {
-                            setFieldMessages({
-                                ...fieldMessages,
-                                maxValue: getMaxValueValidityMessage(newMax)
-                            });
+                            setMaxValueValidityMessage(getMaxValueValidityMessage(newMax));
                             setMaxValue(newMax);
                         }}
-                        handleSeverityChange={handleSeverityChange(thresholds, fieldMessages)}
+                        handleSeverityChange={setThresholds}
                         setTimeUnit={setTimeUnit} />}
                 {modalStage === ModalStage.REVIEW &&
                     <Review
-                        showCustomization={showCustomization}
+                        showCustomization={optInCustomization}
                         newSymptomName={name}
                         newSymptomType={type}
                         newSymptomMaxValue={maxValue}
                         newSymptomThresholds={thresholds as SeverityThresholds}
                         newSymptomTimeUnit={timeUnit}
                         handleSave={() => {
-                            addSymptom(name, type, maxValue, timeUnit, thresholds as SeverityThresholds);
+                            addSymptom(name, type, maxValue, optInCustomization ? timeUnit : undefined, optInCustomization ? thresholds as SeverityThresholds : undefined);
                             setModalStage(ModalStage.BASIC_SETUP);
-                            setShowCustomization(false);
                             setName('');
                             setType(SymptomType.BOOLEAN);
-                            setMaxValue(undefined);
-                            setTimeUnit(undefined);
-                            setThresholds(severityExtremes);
-                            setFieldMessages({
-                                name: '',
-                                mild: '',
-                                moderate: '',
-                                strong: '',
-                                maxValue: ''
-                            });
+                            resetCustom();
+                            setNameValidityMessage('');
                             setIsOpen(false);
                         }}/>}
             </div>

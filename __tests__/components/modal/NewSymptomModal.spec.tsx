@@ -36,7 +36,7 @@ describe('NewSymptomModal', () => {
         vi.clearAllMocks();
     });
 
-    test('set up correctly', () => {
+    test('set up correctly with \'Next\' button disabled', () => {
         expect((screen.getByLabelText('Presence/Absence') as HTMLInputElement).checked).toBeTruthy();
         expect((screen.getByLabelText('Count') as HTMLInputElement).checked).toBeFalsy();
         expect((screen.getByLabelText('Duration') as HTMLInputElement).checked).toBeFalsy();
@@ -279,20 +279,14 @@ describe('NewSymptomModal', () => {
         fireEvent.click(screen.getByText('Next'));
 
         // test user on customization stage
-        expect(await screen.findByText('What values do you want to track?')).toBeDefined();
-        const mildInput = screen.getByLabelText('Mild') as HTMLInputElement;
+        expect(await screen.findByText('Preview')).toBeDefined();
         const moderateInput = screen.getByLabelText('Moderate') as HTMLInputElement;
         const strongInput = screen.getByLabelText('Strong') as HTMLInputElement;
-        expect(mildInput.value).toBe('');
         expect(moderateInput.value).toBe('');
         expect(strongInput.value).toBe('');
         testButtonsDisabled(false, true);
 
-        // test user customizes sympotm
-        fireEvent.change(mildInput, { target: { value: '1' }});
-        expect(mildInput.value).toBe('1');
-        testButtonsDisabled(false, true);
-
+        // test user customizes symptom
         fireEvent.change(moderateInput, { target: { value: '2' }});
         expect(moderateInput.value).toBe('2');
         testButtonsDisabled(false, true);

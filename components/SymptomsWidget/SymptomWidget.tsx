@@ -1,6 +1,6 @@
 'use client';
 
-import { CountSymptom, SymptomEntry, SymptomType, DEFAULT_MAX_THRESHOLDS, TimeUnit, DurationSymptom, SeveritySymptom, SeverityThresholds } from '@/types/symptoms';
+import { CountSymptom, SymptomEntry, SymptomType, DEFAULTS, TimeUnit, DurationSymptom, SeveritySymptom, SeverityThresholds } from '@/types/symptoms';
 import BooleanActionWidget from './actions/BooleanActionWidget';
 import CountActionWidget from './actions/CountActionWidget';
 import ActionInputWidget from './actions/ActionInputWidget';
@@ -16,19 +16,20 @@ type Props = {
 export default function SymptomWidget({ symptom, color, updateSymptom }: Props) {
     const { type } = symptom
     const customMax: number | undefined = (symptom as CountSymptom).customMax
-    const isHoursValue = type === SymptomType.DURATION && symptom.timeUnit === TimeUnit.HOURS;
-    const thresholds: SeverityThresholds = (symptom as SeveritySymptom).customThresholds || DEFAULT_MAX_THRESHOLDS[SymptomType.SEVERITY]
+    const timeUnit = (symptom as DurationSymptom).timeUnit || DEFAULTS[SymptomType.DURATION].timeUnit;
+    const isHoursValue = type === SymptomType.DURATION && timeUnit === TimeUnit.HOURS;
+    const thresholds: SeverityThresholds = (symptom as SeveritySymptom).customThresholds || DEFAULTS[SymptomType.SEVERITY]
 
     let value: number;
     let defaultMax: number;
     switch (type) {
         case SymptomType.BOOLEAN:
         case SymptomType.COUNT:
-            defaultMax = DEFAULT_MAX_THRESHOLDS[type];
+            defaultMax = DEFAULTS[type];
             value = symptom.value as number;
             break;
         case SymptomType.DURATION:
-            defaultMax = DEFAULT_MAX_THRESHOLDS[type][TimeUnit.HOURS];
+            defaultMax = DEFAULTS[type].value;
             value = isHoursValue ? symptom.value / 60  : symptom.value;
             break;
         case SymptomType.SEVERITY:
@@ -45,7 +46,7 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                 <div className='grow flex flex-col justify-between gap-2'>
                     <h3 className='text-st-ink font-bold'>{symptom.name}</h3>
                     <div
-                        className='h-[12px] rounded-lg relative shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]'
+                        className='h-[15px] rounded-lg relative shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]'
                         style={{ background: type === SymptomType.SEVERITY ? `linear-gradient(to right, white, ${color})` : 'var(--color-st-canvas)' }}>
                         <div
                             className={`h-full rounded-l-lg ${value >= max ? 'rounded-r-lg' : ''}`}
@@ -71,21 +72,24 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                                 }}/>}
                         {type === SymptomType.SEVERITY &&
                             <div className='absolute inset-0 flex z-10'>
-                                {Object.entries(thresholds).map(([threshold, _max]: [threshold: string, max: number], i: number) => {
+                                {Object.entries(thresholds).map(([threshold]: [threshold: string, max: number], i: number) => {
                                     if (threshold === 'none' || threshold === 'extreme') {
                                         return null;
                                     }
                                     const range = threshold === 'strong' ? thresholds.extreme - thresholds.strong :
                                         threshold === 'moderate' ? thresholds.strong - thresholds.moderate : thresholds.moderate - 1;
+                                    console.log(`${threshold}: ${range}`);
                                     return (
                                         <p
                                             key={i}
                                             style={{ width: `calc(100% / 9 * ${range})` }}
                                             className={
                                                 clsx(
-                                                    'text-xs scale-75 h-full border-st-ink/70 flex items-center justify-center pointer-events-nonek',
+                                                    'h-full border-st-ink/70 flex items-center justify-center pointer-events-nonek',
                                                     { 'border-r' : threshold === 'mild' || threshold === 'moderate' })}>
-                                            <span className='uppercase tracking-wide text-st-ink/85 align-middle leading-none'>{threshold}</span>
+                                            <span className='text-xs uppercase tracking-wide text-st-ink/85 align-middle leading-none w-full inline-block text-center'>
+                                                {range === 1 && (threshold === 'moderate' || threshold === 'strong') ? `${threshold.slice(0,4)}...` : threshold}
+                                            </span>
                                         </p>);
                                 })}
                             </div>}
@@ -116,7 +120,7 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                                     symptom.id,
                                     isHoursValue ? newValue * 60 : newValue);
                             }}  />
-                        {type === SymptomType.DURATION && <span>{(symptom as DurationSymptom).timeUnit}</span>}
+                        {type === SymptomType.DURATION && <span>{timeUnit}</span>}
                         {type === SymptomType.SEVERITY &&
                             <span>
                                 {value === thresholds.none ? 'None' :

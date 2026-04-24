@@ -1,11 +1,10 @@
-import { SymptomEntry, SymptomType, TimeUnit } from '@/types/symptoms';
+import { SymptomEntry, SymptomType } from '@/types/symptoms';
 export const SEED_DATA = {
     symptoms: [
         {
             id: '1',
             name: 'Headache',
             type: SymptomType.DURATION,
-            timeUnit: TimeUnit.HOURS,
             value: 300,
         } as SymptomEntry,
         {

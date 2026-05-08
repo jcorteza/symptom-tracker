@@ -3,9 +3,9 @@
 import ActionWidget from './ActionWidget';
 
 type Props = {
-    value: boolean;
+    value: 0 | 1;
     color: string;
-    updateValue: (value: boolean) => void;
+    updateValue: (value: 0 | 1) => void;
 }
 export default function BooleanActionWidget({value: present, color, updateValue}: Props) {
     return (
@@ -15,10 +15,10 @@ export default function BooleanActionWidget({value: present, color, updateValue}
                 <input
                     type='checkbox'
                     role='switch'
-                    checked={present}
+                    checked={!!present}
                     className='outline-none'
-                    style={{ backgroundColor: !!present ? color : 'var(--color-st-fog)'}}
-                    onChange={() => updateValue(!present)} />
+                    style={{ backgroundColor: present ? color : 'var(--color-st-fog)'}}
+                    onChange={() => updateValue(present ? 0 : 1)} />
             </label>
         </ActionWidget>
     );

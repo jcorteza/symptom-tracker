@@ -10,7 +10,7 @@ import clsx from 'clsx';
 type Props = {
     symptom: SymptomEntry;
     color: string;
-    updateSymptom: (id: string, value: boolean | number) => void;
+    updateSymptom: (id: string, value: number) => void;
 }
 
 export default function SymptomWidget({ symptom, color, updateSymptom }: Props) {
@@ -78,7 +78,6 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                                     }
                                     const range = threshold === 'strong' ? thresholds.extreme - thresholds.strong :
                                         threshold === 'moderate' ? thresholds.strong - thresholds.moderate : thresholds.moderate - 1;
-                                    console.log(`${threshold}: ${range}`);
                                     return (
                                         <p
                                             key={i}
@@ -97,9 +96,9 @@ export default function SymptomWidget({ symptom, color, updateSymptom }: Props) 
                 </div>
                 {type === SymptomType.BOOLEAN &&
                     <BooleanActionWidget
-                        value={symptom.value as boolean}
+                        value={symptom.value}
                         color={color}
-                        updateValue={(newValue: boolean) => updateSymptom(symptom.id, newValue)} />}
+                        updateValue={(newValue: 0 | 1) => updateSymptom(symptom.id, newValue)} />}
                 {type === SymptomType.COUNT &&
                     <CountActionWidget
                         value={value}

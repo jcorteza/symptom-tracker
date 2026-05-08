@@ -13,7 +13,7 @@ type Symptom = {
 
 export type BooleanSymptom = Symptom & {
     type: SymptomType.BOOLEAN;
-    value: boolean;
+    value: 0 | 1;
 }
 
 export type CountSymptom = Symptom & {

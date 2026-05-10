@@ -1,6 +1,6 @@
 # symptom_tracker DB Schema
 
-The purpose of this document is to explain the general structure of the symptom_tracker database and the architectural decisions behind it. This document is for anyone who is interested in understanding how the data is connected and why. The four tables that will be discussed are: users, symptom, symptom_entry, notes_entry. I will not go into detail about every column, instead I will point out places where the design decision wasn’t always straightforward and important factors to note.
+The purpose of this document is to explain the general structure of the symptom_tracker database and the architectural decisions behind it. This document is for anyone who is interested in understanding how the schema is designed and why. The four tables that will be discussed are: users, symptom, symptom_entry, notes_entry. I will not go into detail about every column, instead I will point out places where the design decision wasn’t always straightforward and important factors to note.
 
 ```mermaid
 ---
@@ -11,13 +11,11 @@ config:
     entityPadding: 5
     nodeSpacing: 140
     rankSpacing: 75
-    layoutDirection: "LR"
-    fontSize: 10
 ---
 erDiagram
   users ||--o{ symptom : has
-  users ||--o{ notes_entry : writes
-  symptom ||--o{ symptom_entry : logs
+  users ||--o{ notes_entry : has
+  symptom ||--o{ symptom_entry : has
   users {
     uuid id PK
     varchar username UK

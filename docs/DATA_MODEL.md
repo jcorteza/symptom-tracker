@@ -18,7 +18,8 @@ erDiagram
   symptom ||--o{ symptom_entry : has
   users {
     uuid id PK
-    varchar username UK
+    varchar email UK
+    varchar emailVerified
     varchar password
     varchar display_name
     varchar timezone

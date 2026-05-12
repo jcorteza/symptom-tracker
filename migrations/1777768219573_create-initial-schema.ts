@@ -7,15 +7,13 @@ export const up = (pgm: MigrationBuilder) => {
             primaryKey: true,
             default: PgLiteral.create('gen_random_uuid()')
         },
-        username: {
-            type: 'varchar(20)',
+        email: {
+            type: 'varchar(255)',
             notNull: true,
             unique: true
         },
-        password: {
-            type: 'varchar(60)',
-            notNull: true
-        },
+        emailVerified : 'timestamptz',
+        password: 'varchar(60)',
         'display_name': 'varchar(30)',
         timezone: {
             type: 'varchar(32)',
@@ -25,9 +23,7 @@ export const up = (pgm: MigrationBuilder) => {
             type: 'varchar(30)[]',
             default: pgm.func('\'{}\'::varchar(30)[]')
         }
-    }, {
-        ifNotExists: true
-    });
+    }, { ifNotExists: true });
     pgm.createTable('symptom', {
         id: {
             type: 'uuid',
@@ -109,7 +105,7 @@ export const up = (pgm: MigrationBuilder) => {
             default: pgm.func('\'{}\'::varchar(30)[]')
         }
     }, { ifNotExists: true });
-    pgm.createIndex('symptom', 'users_id');
+    pgm.createIndex('symptom', 'users_id', { ifNotExists: true });
     pgm.addConstraint('symptom_entry', null, { primaryKey: ['symptom_id','local_date'] })
     pgm.addConstraint('notes_entry', null, { primaryKey: ['users_id', 'local_date'] })
 };

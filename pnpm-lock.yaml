@@ -36,6 +36,9 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.19.33
+      '@types/pg':
+        specifier: ^8.20.0
+        version: 8.20.0
       '@types/react':
         specifier: ^19
         version: 19.2.14
@@ -56,7 +59,7 @@ importers:
         version: 28.1.0
       node-pg-migrate:
         specifier: ^8.0.4
-        version: 8.0.4(pg@8.20.0)
+        version: 8.0.4(@types/pg@8.20.0)(pg@8.20.0)
       tailwindcss:
         specifier: ^4
         version: 4.2.0
@@ -948,6 +951,9 @@ packages:
 
   '@types/node@20.19.33':
     resolution: {integrity: sha512-Rs1bVAIdBs5gbTIKza/tgpMuG1k3U/UMJLWecIMxNdJFDMzcM5LOiLVRYh3PilWEYDIeUDv7bpiHPLPsbydGcw==}
+
+  '@types/pg@8.20.0':
+    resolution: {integrity: sha512-bEPFOaMAHTEP1EzpvHTbmwR8UsFyHSKsRisLIHVMXnpNefSbGA1bD6CVy+qKjGSqmZqNqBDV2azOBo8TgkcVow==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -3548,6 +3554,12 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/pg@8.20.0':
+    dependencies:
+      '@types/node': 20.19.33
+      pg-protocol: 1.13.0
+      pg-types: 2.2.0
+
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
       '@types/react': 19.2.14
@@ -4938,11 +4950,13 @@ snapshots:
       object.entries: 1.1.9
       semver: 6.3.1
 
-  node-pg-migrate@8.0.4(pg@8.20.0):
+  node-pg-migrate@8.0.4(@types/pg@8.20.0)(pg@8.20.0):
     dependencies:
       glob: 11.1.0
       pg: 8.20.0
       yargs: 17.7.2
+    optionalDependencies:
+      '@types/pg': 8.20.0
 
   node-releases@2.0.27: {}
 
